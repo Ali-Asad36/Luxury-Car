@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital,wght@0,400;1,400&family=Orbitron:wght@400;500;600;700;800&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-hud: "Orbitron", monospace;
+}
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+
+/* ── Liquid glass base ── */
+.liquid-glass {
+  background: rgba(255,255,255,0.015);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.08);
+  position: relative;
+  overflow: hidden;
+}
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.35) 0%,
+    rgba(255,255,255,0.08) 25%,
+    rgba(255,255,255,0) 50%,
+    rgba(255,255,255,0.08) 75%,
+    rgba(255,255,255,0.35) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.glass-pill {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 9999px;
+  box-shadow: none !important;
+}
+
+/* ── Selection ── */
+::selection {
+  background-color: #00f0ff;
+  color: #000000;
+}
+
+/* ── Futuristic HUD card ── */
+@keyframes beam-rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes scan-down {
+  0%   { top: -10%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 110%; opacity: 0; }
+}
+@keyframes pulse-dot {
+  0%,100% { opacity: 0.3; transform: scale(0.8); }
+  50%     { opacity: 1;   transform: scale(1.2); }
+}
+@keyframes neon-flicker {
+  0%,100% { opacity: 1; }
+  92%     { opacity: 1; }
+  93%     { opacity: 0.4; }
+  94%     { opacity: 1; }
+  96%     { opacity: 0.6; }
+  97%     { opacity: 1; }
+}
+@keyframes holo-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes grid-scroll {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(60px); }
+}
+@keyframes data-tick {
+  0%,100% { opacity: 0.4; }
+  50%     { opacity: 1; }
+}
+@keyframes corner-pulse {
+  0%,100% { box-shadow: 0 0 6px 0 var(--card-glow); }
+  50%     { box-shadow: 0 0 18px 3px var(--card-glow); }
+}
+
+/* HUD card wrapper */
+.hud-card {
+  position: relative;
+  cursor: pointer;
+}
+.hud-card .beam-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.hud-card .beam-ring::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 50px;
+  height: 200%;
+  margin-left: -25px;
+  margin-top: -100%;
+  background: linear-gradient(
+    transparent 0%,
+    var(--card-glow) 45%,
+    rgba(255,255,255,0.95) 50%,
+    var(--card-glow) 55%,
+    transparent 100%
+  );
+  animation: beam-rotate 4s linear infinite;
+  transform-origin: center center;
+}
+.hud-card .beam-ring::after {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  border-radius: calc(0.75rem - 1.5px);
+  background: #020409;
+}
+
+/* Corner bracket accents */
+.hud-card .corner-tl,
+.hud-card .corner-tr,
+.hud-card .corner-bl,
+.hud-card .corner-br {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  z-index: 20;
+  animation: corner-pulse 2s ease-in-out infinite;
+}
+.hud-card .corner-tl { top: 6px;  left: 6px;  border-top: 2px solid var(--card-glow); border-left: 2px solid var(--card-glow); }
+.hud-card .corner-tr { top: 6px;  right: 6px; border-top: 2px solid var(--card-glow); border-right: 2px solid var(--card-glow); }
+.hud-card .corner-bl { bottom: 6px; left: 6px;  border-bottom: 2px solid var(--card-glow); border-left: 2px solid var(--card-glow); }
+.hud-card .corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid var(--card-glow); border-right: 2px solid var(--card-glow); }
+
+/* Scanline on hover */
+.hud-card:hover .scan-line {
+  display: block;
+}
+.scan-line {
+  display: none;
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--card-glow), transparent);
+  box-shadow: 0 0 8px var(--card-glow);
+  animation: scan-down 2s ease-in-out infinite;
+  z-index: 25;
+  pointer-events: none;
+}
+
+/* Scrolling grid bg */
+.hud-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 24px 24px;
+  animation: grid-scroll 8s linear infinite;
+  pointer-events: none;
+}
+
+/* Neon flicker text utility */
+.neon-flicker {
+  animation: neon-flicker 6s ease-in-out infinite;
+}
+
+/* HUD font utility */
+.font-hud {
+  font-family: "Orbitron", monospace;
+}
+
+/* Holographic border shimmer */
+.holo-border {
+  background: linear-gradient(90deg, #00f0ff, #a855f7, #f97316, #00f0ff);
+  background-size: 300% 100%;
+  animation: holo-shift 3s linear infinite;
+}
